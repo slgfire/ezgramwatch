@@ -1,6 +1,6 @@
 services:
   ezgramwatch:
-    build: .
+    image: ghcr.io/slgfire/ezgramwatch:latest
     container_name: ezgramwatch
     restart: unless-stopped
     env_file: .env

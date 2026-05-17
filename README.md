@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.png" alt="ezgramwatch" width="256"/>
+  <img src="logo.png" alt="ezgramwatch" width="500"/>
 
   [![Build](https://img.shields.io/github/actions/workflow/status/slgfire/ezgramwatch/build.yml?branch=main&label=build&style=flat-square)](https://github.com/slgfire/ezgramwatch/actions/workflows/build.yml)
   [![Docker](https://img.shields.io/github/actions/workflow/status/slgfire/ezgramwatch/docker.yml?branch=main&label=docker&style=flat-square)](https://github.com/slgfire/ezgramwatch/actions/workflows/docker.yml)

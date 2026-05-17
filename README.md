@@ -163,7 +163,7 @@ Then start the bot:
 
 ```bash
 mkdir -p data
-docker compose up --build -d
+docker compose up -d
 docker compose logs -f
 ```
 
@@ -220,8 +220,8 @@ The SQLite database in `./data` persists across container restarts and image upd
 ## Updating
 
 ```bash
-docker compose pull          # if using a pre-built image from GHCR
-docker compose up --build -d # or rebuild locally
+docker compose pull
+docker compose up -d
 ```
 
 ---

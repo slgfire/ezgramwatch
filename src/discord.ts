@@ -31,7 +31,7 @@ export class DiscordWebhookError extends Error {
 }
 
 function escapeMarkdown(text: string): string {
-  return text.replace(/[*_~|`>#\[\]()\\]/g, '\\$&');
+  return text.replace(/[*_~|`>#[\]()\\]/g, '\\$&');
 }
 
 function truncate(text: string, maxChars: number): string {

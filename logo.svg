@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F77737"/>
+      <stop offset="35%" stop-color="#E1306C"/>
+      <stop offset="70%" stop-color="#C13584"/>
+      <stop offset="100%" stop-color="#833AB4"/>
+    </linearGradient>
+    <linearGradient id="igLens" x1="20%" y1="20%" x2="80%" y2="80%">
+      <stop offset="0%" stop-color="#E1306C"/>
+      <stop offset="100%" stop-color="#833AB4"/>
+    </linearGradient>
+    <clipPath id="bg-clip">
+      <rect width="512" height="512" rx="108" ry="108"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="108" ry="108" fill="#0d1117"/>
+
+  <!-- Eye top arc -->
+  <path d="M 72 256 Q 256 88 440 256"
+        fill="none" stroke="url(#ig)" stroke-width="24" stroke-linecap="round"/>
+  <!-- Eye bottom arc -->
+  <path d="M 72 256 Q 256 424 440 256"
+        fill="none" stroke="url(#ig)" stroke-width="24" stroke-linecap="round"/>
+
+  <!-- Iris background -->
+  <circle cx="256" cy="256" r="92" fill="#161b22"/>
+
+  <!-- Iris gradient border -->
+  <circle cx="256" cy="256" r="92" fill="none" stroke="url(#ig)" stroke-width="5"/>
+
+  <!-- Camera lens (iris) -->
+  <circle cx="256" cy="256" r="68" fill="url(#igLens)"/>
+
+  <!-- Inner lens ring -->
+  <circle cx="256" cy="256" r="48" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="3"/>
+
+  <!-- Pupil -->
+  <circle cx="256" cy="256" r="32" fill="#0d1117"/>
+
+  <!-- Highlight -->
+  <circle cx="240" cy="240" r="11" fill="white" opacity="0.65"/>
+  <circle cx="237" cy="237" r="4" fill="white" opacity="0.9"/>
+</svg>

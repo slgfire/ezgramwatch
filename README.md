@@ -1,147 +1,241 @@
-# ezgramwatch
+<div align="center">
+  <img src="logo.png" alt="ezgramwatch" width="256"/>
 
-A headless Docker service that polls one or more Instagram Business/Creator accounts
-via the **official Meta Graph API** and forwards new posts and Reels to a Discord channel
-using Webhook embeds.
+  [![Build](https://img.shields.io/github/actions/workflow/status/slgfire/ezgramwatch/build.yml?branch=main&label=build&style=flat-square)](https://github.com/slgfire/ezgramwatch/actions/workflows/build.yml)
+  [![Docker](https://img.shields.io/github/actions/workflow/status/slgfire/ezgramwatch/docker.yml?branch=main&label=docker&style=flat-square)](https://github.com/slgfire/ezgramwatch/actions/workflows/docker.yml)
+  [![Release](https://img.shields.io/github/v/release/slgfire/ezgramwatch?include_prereleases&style=flat-square)](https://github.com/slgfire/ezgramwatch/releases)
+  [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
-> **Important:** This bot only works with Instagram accounts that *you own* and have
-> connected to a Meta Developer App. Monitoring third-party profiles is not supported
-> by the official API. See [`.ai/API_LIMITATIONS.md`](.ai/API_LIMITATIONS.md) for details.
+  **🔔 Automatically forwards your Instagram Business posts and Reels to Discord via the official Meta Graph API — no scraping, fully ToS-compliant**
+</div>
+
+---
+
+> **Heads up:** This bot only works with Instagram accounts **you own** and have connected to a Meta Developer App. Monitoring other people's profiles is not possible through the official API.
 
 ## Features
 
-- Polls Instagram Business/Creator accounts on a configurable interval
-- Detects new posts, videos, and Reels; deduplicates via SQLite
-- Sends rich Discord embeds with caption preview, post type, timestamp, and thumbnail
-- Carousel posts rendered as a multi-image Discord gallery (up to 10 images per embed)
-- Graceful first-run behaviour: existing posts are imported silently without spamming Discord
-- Optional automatic token refresh before the 60-day expiry (requires Meta App credentials)
-- Structured JSON logs via [pino](https://github.com/pinojs/pino)
-- Fully configured via environment variables — no config files
+- 📸 Detects new **posts, videos, and Reels** on a configurable polling interval
+- 🖼️ **Carousel albums** are sent as a multi-image Discord gallery (up to 10 images per message)
+- 🔇 **Silent first run** — existing posts are imported without flooding Discord
+- 🔑 **Automatic token refresh** 7 days before expiry (requires Meta App credentials)
+- 🗃️ SQLite-backed deduplication — no duplicate posts after restarts
+- 🐳 Single Docker Compose command to run
 
-## Requirements
+## Prerequisites
 
-- A **Meta Developer account** and a Facebook App with the following permissions:
-  - `instagram_basic`
-  - `pages_read_engagement`
-- One or more **Instagram Business or Creator accounts** connected to a Facebook Page
-- A **Discord server** with a Webhook URL (Server Settings → Integrations → Webhooks)
-- Docker and Docker Compose
+Before you start, you'll need:
 
-## Instagram API Setup
+- A **Meta Developer account** — [developers.facebook.com](https://developers.facebook.com)
+- An **Instagram Business or Creator account** linked to a Facebook Page
+- A **Discord server** where you have permission to create Webhooks
+- **Docker** and **Docker Compose** installed on your server
 
-### 1. Create a Meta App
+---
 
-1. Go to [developers.facebook.com](https://developers.facebook.com) and create an account.
-2. Create a new App of type **Business**.
-3. Under **App Dashboard → Add a Product**, add **Instagram Graph API**.
+## Setup Guide
 
-### 2. Connect your Instagram account
+### Step 1 — Create a Discord Webhook
 
-1. Under **Instagram Graph API → Settings**, connect your Facebook Page.
-2. Make sure your Instagram account is set as **Business** or **Creator** in the Instagram app.
+1. Open your Discord server and go to the channel where posts should appear.
+2. Click the **gear icon ⚙️** next to the channel name → **Integrations** → **Webhooks**.
+3. Click **New Webhook**, give it a name (e.g. `ezgramwatch`), and optionally set an avatar.
+4. Click **Copy Webhook URL**.
 
-### 3. Obtain a Long-Lived Access Token
+Save this URL — you'll need it as `DISCORD_WEBHOOK_URL`.
 
-The easiest path for self-hosted deployments:
+---
 
-1. In the **Graph API Explorer** (`developers.facebook.com/tools/explorer`):
-   - Select your app.
-   - Add permissions: `instagram_basic`, `pages_read_engagement`.
-   - Generate a User Access Token.
-2. Exchange for a **long-lived token** (valid 60 days):
-   ```
-   GET https://graph.facebook.com/oauth/access_token
-     ?grant_type=fb_exchange_token
-     &client_id=<app_id>
-     &client_secret=<app_secret>
-     &fb_exchange_token=<short_lived_token>
-   ```
-3. Store the result in `INSTAGRAM_ACCESS_TOKEN`.
+### Step 2 — Create a Meta Developer App
 
-### 4. Find your Instagram User ID
+1. Go to [developers.facebook.com](https://developers.facebook.com) and sign in.
+2. Click **My Apps** → **Create App**.
+3. Choose **Business** as the app type, give it a name, and confirm.
+4. On the App Dashboard, click **Add Product** and add **Instagram Graph API**.
 
+> **App Mode:** Your app starts in Development mode. This is fine for personal use — you can connect your own account as a Tester without going through App Review.
+
+---
+
+### Step 3 — Connect your Instagram account
+
+1. In the App Dashboard, go to **Instagram Graph API → Settings**.
+2. Click **Add Instagram Tester** and enter your Instagram username.
+3. Open Instagram on your phone → **Settings → Apps and Websites → Tester Invites** → Accept the invitation.
+
+Your Instagram account is now linked to the app.
+
+---
+
+### Step 4 — Get a Long-Lived Access Token
+
+#### 4a. Generate a short-lived token in Graph API Explorer
+
+1. Open the [Graph API Explorer](https://developers.facebook.com/tools/explorer).
+2. Select your app from the top-right dropdown.
+3. Click **Generate Access Token**.
+4. In the permission dialog, make sure both of these are checked:
+   - `instagram_basic`
+   - `pages_read_engagement`
+5. Click **Generate Access Token** and confirm in the popup. Copy the token shown.
+
+The token from the Explorer is valid for only **1 hour**. Exchange it for a 60-day token in the next step.
+
+#### 4b. Exchange for a long-lived token
+
+Run the following `curl` command, replacing the placeholders with your values:
+
+```bash
+curl "https://graph.facebook.com/oauth/access_token\
+?grant_type=fb_exchange_token\
+&client_id=YOUR_APP_ID\
+&client_secret=YOUR_APP_SECRET\
+&fb_exchange_token=YOUR_SHORT_LIVED_TOKEN"
 ```
-GET https://graph.facebook.com/me/accounts?access_token=<token>
+
+You'll find your **App ID** and **App Secret** in the App Dashboard under **Settings → Basic**.
+
+The response looks like this:
+
+```json
+{
+  "access_token": "EAABsb...",
+  "token_type": "bearer",
+  "expires_in": 5183944
+}
 ```
 
-This returns the connected Pages. From the Page, fetch the connected IG account:
+Copy the `access_token` value — this is your `INSTAGRAM_ACCESS_TOKEN`. It's valid for ~60 days.
 
+> **Tip:** To avoid manually renewing every 60 days, set `META_APP_ID` and `META_APP_SECRET` in your `.env`. The bot will auto-refresh the token when it has fewer than 7 days remaining.
+
+---
+
+### Step 5 — Find your Instagram User ID
+
+You need the numeric ID of your Instagram Business account (not your username).
+
+1. In the [Graph API Explorer](https://developers.facebook.com/tools/explorer), make sure your long-lived token is pasted in the **Access Token** field.
+2. In the query field, type `me/accounts` and click **Submit**. You'll get a list of Facebook Pages — note the `id` of your page.
+3. Now type `/<your_page_id>?fields=instagram_business_account` and click **Submit**:
+
+```json
+{
+  "instagram_business_account": {
+    "id": "17841400000000001"
+  },
+  "id": "123456789012345"
+}
 ```
-GET https://graph.facebook.com/<page_id>?fields=instagram_business_account&access_token=<token>
+
+The number inside `instagram_business_account.id` is your Instagram User ID.
+
+Use it in `INSTAGRAM_ACCOUNTS` like this:
+```
+INSTAGRAM_ACCOUNTS=17841400000000001:mychannel
 ```
 
-The `instagram_business_account.id` is what you put in `INSTAGRAM_ACCOUNTS`.
+The `:mychannel` part is an optional display alias shown in the logs. If omitted, the bot fetches your actual username from the API.
 
-## Configuration
+---
 
-Copy `.env.example` to `.env` and fill in your values.
-
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `DISCORD_WEBHOOK_URL` | yes | — | Full Discord Webhook URL |
-| `INSTAGRAM_ACCESS_TOKEN` | yes | — | Long-lived User Access Token (bootstrap) |
-| `INSTAGRAM_ACCOUNTS` | yes | — | `<ig_user_id>[:<display_name>],…` comma-separated |
-| `META_APP_ID` | no | — | Meta App ID (enables auto token refresh) |
-| `META_APP_SECRET` | no | — | Meta App Secret (enables auto token refresh) |
-| `POLL_INTERVAL_SECONDS` | no | `300` | Polling interval in seconds |
-| `POST_EXISTING_ON_FIRST_RUN` | no | `false` | Post existing media on first start |
-| `FIRST_RUN_POST_LIMIT` | no | `10` | Max posts to send when `POST_EXISTING_ON_FIRST_RUN=true` |
-| `CAPTION_PREVIEW_CHARS` | no | `300` | Caption characters shown in embed |
-| `MEDIA_FETCH_LIMIT` | no | `25` | Items fetched per poll (1–100) |
-| `LOG_LEVEL` | no | `info` | Pino log level |
-| `DATABASE_PATH` | no | `/data/bot.sqlite` | SQLite path inside the container |
-| `GRAPH_API_VERSION` | no | `v21.0` | Meta Graph API version |
-
-### Token auto-refresh
-
-When `META_APP_ID` and `META_APP_SECRET` are set, the bot automatically refreshes the
-access token when it has fewer than 7 days remaining. The refreshed token is stored in
-SQLite — you do not need to update the `.env` file.
-
-Without these vars the bot will log a warning as the token approaches expiry.
-You can also use a **System User Token** (which never expires) and skip auto-refresh.
-
-## Quick Start
+### Step 6 — Configure and run
 
 ```bash
 git clone https://github.com/slgfire/ezgramwatch
 cd ezgramwatch
 cp .env.example .env
-# Edit .env with your credentials
+```
+
+Open `.env` and fill in the required values:
+
+```env
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+INSTAGRAM_ACCESS_TOKEN=EAABsb...
+INSTAGRAM_ACCOUNTS=17841400000000001:myaccount
+
+# Optional but recommended — enables auto token refresh
+META_APP_ID=123456789
+META_APP_SECRET=abc123...
+```
+
+Then start the bot:
+
+```bash
 mkdir -p data
 docker compose up --build -d
 docker compose logs -f
 ```
 
-## Volume and Permissions
+On first start you'll see something like:
 
-The container runs as user `node` (uid=1000). The `./data` directory must be writable
-by uid=1000:
+```
+{"msg":"poll.account","fetched":12,"new":12,"posted":0}
+```
+
+All existing posts are silently imported. Only new posts from this point on will be forwarded to Discord.
+
+---
+
+## Configuration Reference
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `DISCORD_WEBHOOK_URL` | ✅ | — | Full Discord Webhook URL |
+| `INSTAGRAM_ACCESS_TOKEN` | ✅ | — | Long-lived User Access Token (bootstrap) |
+| `INSTAGRAM_ACCOUNTS` | ✅ | — | `<ig_user_id>[:<alias>],…` comma-separated |
+| `META_APP_ID` | — | — | Meta App ID — enables auto token refresh |
+| `META_APP_SECRET` | — | — | Meta App Secret — enables auto token refresh |
+| `POLL_INTERVAL_SECONDS` | — | `300` | How often to check for new posts (seconds) |
+| `POST_EXISTING_ON_FIRST_RUN` | — | `false` | Set `true` to post up to `FIRST_RUN_POST_LIMIT` existing posts on first start |
+| `FIRST_RUN_POST_LIMIT` | — | `10` | Max posts sent when `POST_EXISTING_ON_FIRST_RUN=true` |
+| `CAPTION_PREVIEW_CHARS` | — | `300` | Characters of caption shown in the embed |
+| `MEDIA_FETCH_LIMIT` | — | `25` | Items fetched per poll (max 100) |
+| `LOG_LEVEL` | — | `info` | Log level: `trace` `debug` `info` `warn` `error` |
+| `DATABASE_PATH` | — | `/data/bot.sqlite` | SQLite path inside the container |
+| `GRAPH_API_VERSION` | — | `v21.0` | Meta Graph API version |
+
+### Monitoring multiple accounts
+
+Separate accounts with commas:
+
+```env
+INSTAGRAM_ACCOUNTS=17841400000000001:brand,17841400000000002:personal
+```
+
+---
+
+## Volume & Permissions
+
+The container runs as the `node` user (uid=1000). Make sure the `./data` directory is writable:
 
 ```bash
 sudo chown -R 1000:1000 ./data
 ```
 
-SQLite data survives container restarts as long as `./data` is mounted.
+The SQLite database in `./data` persists across container restarts and image updates.
+
+---
 
 ## Updating
 
 ```bash
-docker compose pull   # if using a pre-built image
-docker compose up --build -d
+docker compose pull          # if using a pre-built image from GHCR
+docker compose up --build -d # or rebuild locally
 ```
 
-## Limitations
+---
 
-See [`.ai/API_LIMITATIONS.md`](.ai/API_LIMITATIONS.md) for a full list of known API constraints,
-rate limits, and caveats.
+## Known Limitations
 
-Key points:
-- **Own accounts only** — cannot monitor third-party or personal profiles.
-- **Stories not supported** — different endpoint, 24-hour lifetime, out of scope.
-- **60-day token expiry** — set `META_APP_ID` + `META_APP_SECRET` for auto-refresh.
-- **Pagination** — only the most recent `MEDIA_FETCH_LIMIT` items are fetched per poll.
+- **Own accounts only** — the Graph API does not provide access to third-party profiles.
+- **Stories not supported** — they use a separate endpoint with a 24-hour lifetime and are out of scope.
+- **60-day token expiry** — configure `META_APP_ID` + `META_APP_SECRET` for automatic renewal.
+- **Rate limits** — 200 API calls/hour (Standard tier). With the default `POLL_INTERVAL_SECONDS=300` and a small number of accounts this is not an issue.
+
+See [`.ai/API_LIMITATIONS.md`](.ai/API_LIMITATIONS.md) for the full list.
+
+---
 
 ## License
 

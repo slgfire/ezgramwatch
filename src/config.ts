@@ -20,6 +20,8 @@ const schema = z.object({
   GRAPH_API_VERSION: z.string().default('v21.0'),
   MEDIA_FETCH_LIMIT: z.coerce.number().int().min(1).max(100).default(25),
   CAPTION_PREVIEW_CHARS: z.coerce.number().int().positive().default(300),
+  META_APP_ID: z.string().optional(),
+  META_APP_SECRET: z.string().optional(),
 });
 
 export type Config = z.infer<typeof schema>;

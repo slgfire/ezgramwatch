@@ -172,6 +172,7 @@ All existing posts are silently imported. Only new posts from this point on will
 | `DISCORD_WEBHOOK_URL` | ✅ | — | Full Discord Webhook URL |
 | `INSTAGRAM_ACCESS_TOKEN` | ✅ | — | Long-lived User Access Token (`instagram_business_basic`) |
 | `INSTAGRAM_ACCOUNTS` | ✅ | — | `<ig_user_id>[:<alias>],…` comma-separated |
+| `INSTAGRAM_TOKEN_EXPIRES_AT` | — | — | Unix timestamp of token expiry (from Token Debugger → "Ablaufdatum") — improves auto-refresh accuracy |
 | `POLL_INTERVAL_SECONDS` | — | `300` | How often to check for new posts (seconds) |
 | `POST_EXISTING_ON_FIRST_RUN` | — | `false` | Set `true` to post up to `FIRST_RUN_POST_LIMIT` existing posts on first start |
 | `FIRST_RUN_POST_LIMIT` | — | `10` | Max posts sent when `POST_EXISTING_ON_FIRST_RUN=true` |

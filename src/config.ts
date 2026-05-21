@@ -20,6 +20,7 @@ const schema = z.object({
   GRAPH_API_VERSION: z.string().default('v21.0'),
   MEDIA_FETCH_LIMIT: z.coerce.number().int().min(1).max(100).default(25),
   CAPTION_PREVIEW_CHARS: z.coerce.number().int().positive().default(300),
+  INSTAGRAM_TOKEN_EXPIRES_AT: z.coerce.number().int().positive().optional(),
 });
 
 export type Config = z.infer<typeof schema>;

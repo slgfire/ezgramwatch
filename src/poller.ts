@@ -19,7 +19,9 @@ const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, m
 export function bootstrapToken(config: Config, db: Db): void {
   if (!db.getState('access_token')) {
     db.setState('access_token', config.INSTAGRAM_ACCESS_TOKEN);
-    const expires = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
+    const expires = config.INSTAGRAM_TOKEN_EXPIRES_AT
+      ? new Date(config.INSTAGRAM_TOKEN_EXPIRES_AT * 1000).toISOString()
+      : new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
     db.setState('access_token_expires_at', expires);
     logger.debug({ expires }, 'token.bootstrap');
   }

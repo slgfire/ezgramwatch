@@ -172,8 +172,11 @@ All existing posts are silently imported. Only new posts from this point on will
 | `CAPTION_PREVIEW_CHARS` | — | `300` | Characters of caption shown in the embed |
 | `MEDIA_FETCH_LIMIT` | — | `25` | Items fetched per poll (max 100) |
 | `LOG_LEVEL` | — | `info` | Log level: `trace` `debug` `info` `warn` `error` |
+| `LOG_PRETTY` | — | `true`¹ | Human-readable logs; set `false` for JSON (e.g. log aggregation) |
 | `DATABASE_PATH` | — | `/data/bot.sqlite` | SQLite path inside the container |
 | `GRAPH_API_VERSION` | — | `v21.0` | Meta Graph API version |
+
+¹ Default `true` set in `compose.yaml`; override with `LOG_PRETTY=false` in `.env` for JSON output.
 
 ### Monitoring multiple accounts
 

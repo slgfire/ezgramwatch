@@ -57,7 +57,16 @@ Save this URL — you'll need it as `DISCORD_WEBHOOK_URL`.
 
 ---
 
-### Step 3 — Connect your Instagram account
+### Step 3 — Add yourself as Developer and connect your Instagram account
+
+#### 3a. Add your Facebook account as Developer
+
+1. In the App Dashboard, go to **Settings → Roles → Roles**.
+2. Click **Add People**, search for your Facebook account, and assign the **Developer** role.
+
+> **Why?** The App starts with you as Admin, but connected Facebook accounts (e.g. a second account you use for Instagram) need to be explicitly added as Developer. Without this you'll see *"Entwickler-Rolle nicht ausreichend"* (Developer role insufficient) when connecting Instagram.
+
+#### 3b. Connect your Instagram account as Tester
 
 1. In the App Dashboard, go to **Instagram Graph API → Settings**.
 2. Click **Add Instagram Tester** and enter your Instagram username.
@@ -223,6 +232,22 @@ The SQLite database in `./data` persists across container restarts and image upd
 docker compose pull
 docker compose up -d
 ```
+
+---
+
+## Troubleshooting
+
+**"Entwickler-Rolle nicht ausreichend" / Developer role insufficient**
+Your Facebook account is not listed as Developer in the App. Go to **Settings → Roles → Roles** in the App Dashboard and add it there (see Step 3a above).
+
+**"Tester Invites" not visible in Instagram settings**
+Make sure your Instagram account is set to **Business** or **Creator** mode. Personal accounts cannot be connected to the Graph API. Change it in the Instagram app under **Settings → Account → Switch to Professional Account**.
+
+**Token works in Graph API Explorer but bot logs a 401**
+The token was generated for a different app or with insufficient permissions. Re-generate it in Graph API Explorer with your correct app selected and both `instagram_basic` and `pages_read_engagement` checked.
+
+**`me/accounts` returns an empty array**
+Your Facebook account is not an Admin of a Facebook Page. The Instagram Business account must be linked to a Page you manage. Create a Page or ask a Page Admin to add you.
 
 ---
 

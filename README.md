@@ -212,16 +212,19 @@ docker compose up -d
 ## Troubleshooting
 
 **"Developer role insufficient" (Entwickler-Rolle nicht ausreichend)**
-Your Facebook account is not listed as Developer in the App. Go to **App Roles** in the left sidebar of the App Dashboard and add it there (see Step 3a above).
+Your Facebook account is not listed as Developer in the App. Go to **App Roles** in the left sidebar of the App Dashboard and add it there (see Step 3a).
 
 **"Tester Invites" not visible in Instagram settings**
 Make sure your Instagram account is set to **Business** or **Creator** mode. Personal accounts cannot be connected to the Graph API. Change this in the Instagram app under **Settings → Account → Switch to Professional Account**.
 
-**Token works in the browser but the bot logs a 401**
-The token was generated for a different app or with insufficient permissions. Re-generate it in the App Dashboard under **Instagram Graph API → API Setup** with `instagram_business_basic` selected.
+**Bot logs a 401 or auth error**
+Re-generate the token in the App Dashboard under **Instagram Graph API → API Setup** and make sure `instagram_business_basic` is included. Paste the new token into `INSTAGRAM_ACCESS_TOKEN` in your `.env` and restart the container.
 
-**`me/accounts` returns an empty array**
-This endpoint is only needed for older app setups. With `instagram_business_basic` tokens, get your Instagram User ID directly via `https://graph.instagram.com/me?fields=id,username&access_token=YOUR_TOKEN` (see Step 5).
+**`Fatal: unable to open database file`**
+The container cannot write to the `./data` directory. Either fix ownership (`sudo chown -R 1000:1000 ./data`) or set `user: "root"` in `compose.yaml`.
+
+**`manifest unknown` when running `docker compose up`**
+The GHCR package is private. Go to your GitHub profile → **Packages → ezgramwatch → Package Settings → Change visibility → Public**.
 
 ---
 

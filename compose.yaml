@@ -4,6 +4,8 @@ services:
     container_name: ezgramwatch
     restart: unless-stopped
     env_file: .env
+    environment:
+      LOG_PRETTY: "true"
     volumes:
       - ./data:/data
     # Runs as node user (uid=1000). If you get "unable to open database file",

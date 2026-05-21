@@ -6,4 +6,7 @@ services:
     env_file: .env
     volumes:
       - ./data:/data
-    user: "root"
+    # Runs as node user (uid=1000). If you get "unable to open database file",
+    # either run: sudo chown -R 1000:1000 ./data
+    # or change this to: user: "root"
+    user: "1000:1000"

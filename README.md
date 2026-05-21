@@ -98,19 +98,6 @@ Newer Meta apps offer a token generator directly in the App Dashboard under **In
 3. Find the row **"Ablaufdatum"** — copy the number before the parenthesis (e.g. `1784580703`)
 4. Add it to `.env`: `INSTAGRAM_TOKEN_EXPIRES_AT=1784580703`
 
-#### Option B: Exchange a short-lived token
-
-If you generated the token via Graph API Explorer it expires in 1 hour. Exchange it for a 60-day token:
-
-```bash
-curl "https://graph.facebook.com/oauth/access_token\
-?grant_type=fb_exchange_token\
-&client_id=YOUR_APP_ID\
-&client_secret=YOUR_APP_SECRET\
-&fb_exchange_token=YOUR_SHORT_LIVED_TOKEN"
-```
-
-App ID and App Secret are in **Settings → Basic**. The `access_token` in the response is your `INSTAGRAM_ACCESS_TOKEN`.
 
 > **Tip:** The bot auto-refreshes the token automatically 7 days before expiry — no extra credentials needed.
 

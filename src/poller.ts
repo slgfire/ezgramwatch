@@ -32,15 +32,10 @@ async function checkAndRefreshToken(config: Config, db: Db): Promise<void> {
   const daysLeft = (new Date(expiresAtStr).getTime() - Date.now()) / 864e5;
   if (daysLeft >= 7) return;
 
-  if (!config.META_APP_ID || !config.META_APP_SECRET) {
-    logger.warn({ daysLeft: Math.round(daysLeft) }, 'token.expiringSoon — set META_APP_ID + META_APP_SECRET for auto-refresh');
-    return;
-  }
-
   const currentToken = db.getState('access_token') ?? config.INSTAGRAM_ACCESS_TOKEN;
   try {
     logger.info({ daysLeft: Math.round(daysLeft) }, 'token.refresh.start');
-    const result = await refreshToken(config.META_APP_ID, config.META_APP_SECRET, currentToken);
+    const result = await refreshToken(currentToken);
     db.setState('access_token', result.access_token);
     db.setState('access_token_expires_at', result.expires_at);
     logger.info({ expires_at: result.expires_at }, 'token.refresh.done');

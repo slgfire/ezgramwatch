@@ -106,28 +106,21 @@ curl "https://graph.facebook.com/oauth/access_token\
 
 App ID and App Secret are in **Settings → Basic**. The `access_token` in the response is your `INSTAGRAM_ACCESS_TOKEN`.
 
-> **Tip:** Set `META_APP_ID` and `META_APP_SECRET` in `.env` so the bot auto-refreshes the token before it expires.
+> **Tip:** The bot auto-refreshes the token automatically 7 days before expiry — no extra credentials needed.
 
 ---
 
 ### Step 5 — Find your Instagram User ID
 
-You need the numeric ID of your Instagram Business account (not your username).
+You need the numeric ID of your Instagram account (not the username).
 
-1. In the [Graph API Explorer](https://developers.facebook.com/tools/explorer), make sure your long-lived token is pasted in the **Access Token** field.
-2. In the query field, type `me/accounts` and click **Submit**. You'll get a list of Facebook Pages — note the `id` of your page.
-3. Now type `/<your_page_id>?fields=instagram_business_account` and click **Submit**:
+**Easiest way:** Call the API directly in your browser or with curl:
 
-```json
-{
-  "instagram_business_account": {
-    "id": "17841400000000001"
-  },
-  "id": "123456789012345"
-}
+```
+https://graph.instagram.com/me?fields=id,username&access_token=YOUR_TOKEN
 ```
 
-The number inside `instagram_business_account.id` is your Instagram User ID.
+The `id` in the response is your Instagram User ID.
 
 Use it in `INSTAGRAM_ACCOUNTS` like this:
 ```
@@ -152,10 +145,6 @@ Open `.env` and fill in the required values:
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 INSTAGRAM_ACCESS_TOKEN=EAABsb...
 INSTAGRAM_ACCOUNTS=17841400000000001:myaccount
-
-# Optional but recommended — enables auto token refresh
-META_APP_ID=123456789
-META_APP_SECRET=abc123...
 ```
 
 Then start the bot:
@@ -181,10 +170,8 @@ All existing posts are silently imported. Only new posts from this point on will
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `DISCORD_WEBHOOK_URL` | ✅ | — | Full Discord Webhook URL |
-| `INSTAGRAM_ACCESS_TOKEN` | ✅ | — | Long-lived User Access Token (bootstrap) |
+| `INSTAGRAM_ACCESS_TOKEN` | ✅ | — | Long-lived User Access Token (`instagram_business_basic`) |
 | `INSTAGRAM_ACCOUNTS` | ✅ | — | `<ig_user_id>[:<alias>],…` comma-separated |
-| `META_APP_ID` | — | — | Meta App ID — enables auto token refresh |
-| `META_APP_SECRET` | — | — | Meta App Secret — enables auto token refresh |
 | `POLL_INTERVAL_SECONDS` | — | `300` | How often to check for new posts (seconds) |
 | `POST_EXISTING_ON_FIRST_RUN` | — | `false` | Set `true` to post up to `FIRST_RUN_POST_LIMIT` existing posts on first start |
 | `FIRST_RUN_POST_LIMIT` | — | `10` | Max posts sent when `POST_EXISTING_ON_FIRST_RUN=true` |
@@ -245,7 +232,7 @@ Your Facebook account is not an Admin of a Facebook Page. The Instagram Business
 
 - **Own accounts only** — the Graph API does not provide access to third-party profiles.
 - **Stories not supported** — they use a separate endpoint with a 24-hour lifetime and are out of scope.
-- **60-day token expiry** — configure `META_APP_ID` + `META_APP_SECRET` for automatic renewal.
+- **60-day token expiry** — the bot renews automatically via `ig_refresh_token` 7 days before expiry.
 - **Rate limits** — 200 API calls/hour (Standard tier). With the default `POLL_INTERVAL_SECONDS=300` and a small number of accounts this is not an issue.
 
 See [`.ai/API_LIMITATIONS.md`](.ai/API_LIMITATIONS.md) for the full list.

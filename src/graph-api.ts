@@ -1,6 +1,6 @@
 import type { Config } from './config.js';
 
-const BASE = (v: string) => `https://graph.facebook.com/${v}`;
+const BASE = (v: string) => `https://graph.instagram.com/${v}`;
 
 export class GraphApiError extends Error {
   constructor(
@@ -99,13 +99,9 @@ export async function fetchCarouselChildren(
   return data.data ?? [];
 }
 
-export async function refreshToken(
-  appId: string,
-  appSecret: string,
-  currentToken: string,
-): Promise<TokenRefreshResult> {
-  // Token is passed as query param here — required by Meta's OAuth endpoint design.
-  const url = `https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${currentToken}`;
+export async function refreshToken(currentToken: string): Promise<TokenRefreshResult> {
+  // instagram_business_basic tokens refresh via ig_refresh_token — no app credentials needed.
+  const url = `https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${currentToken}`;
   const res = await fetch(url);
   const body = (await res.json()) as Record<string, unknown>;
 

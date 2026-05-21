@@ -61,7 +61,7 @@ Save this URL — you'll need it as `DISCORD_WEBHOOK_URL`.
 
 #### 3a. Add your Facebook account as Developer
 
-1. In the App Dashboard, go to **Settings → Roles → Roles**.
+1. In the App Dashboard, go to **App Roles** (in the left sidebar).
 2. Click **Add People**, search for your Facebook account, and assign the **Developer** role.
 
 > **Why?** The App starts with you as Admin, but connected Facebook accounts (e.g. a second account you use for Instagram) need to be explicitly added as Developer. Without this you'll see *"Entwickler-Rolle nicht ausreichend"* (Developer role insufficient) when connecting Instagram.
@@ -238,7 +238,7 @@ docker compose up -d
 ## Troubleshooting
 
 **"Entwickler-Rolle nicht ausreichend" / Developer role insufficient**
-Your Facebook account is not listed as Developer in the App. Go to **Settings → Roles → Roles** in the App Dashboard and add it there (see Step 3a above).
+Your Facebook account is not listed as Developer in the App. Go to **App Roles** in the left sidebar of the App Dashboard and add it there (see Step 3a above).
 
 **"Tester Invites" not visible in Instagram settings**
 Make sure your Instagram account is set to **Business** or **Creator** mode. Personal accounts cannot be connected to the Graph API. Change it in the Instagram app under **Settings → Account → Switch to Professional Account**.

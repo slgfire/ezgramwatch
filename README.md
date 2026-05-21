@@ -90,7 +90,13 @@ Your Instagram account is now linked to the app.
 
 #### Option A: Dashboard token (newer apps)
 
-Newer Meta apps offer a token generator directly in the App Dashboard under **Instagram Graph API → API Setup → Generate Token**. This produces a **long-lived token (~60 days) directly** — no exchange needed. Verify in the [Token Debugger](https://developers.facebook.com/tools/debug/accesstoken): if "Expires" shows ~2 months, you're done.
+Newer Meta apps offer a token generator directly in the App Dashboard under **Instagram Graph API → API Setup → Generate Token**. This produces a **long-lived token (~60 days) directly** — no exchange needed.
+
+**Get the exact expiry timestamp for `.env`:**
+1. Open the [Token Debugger](https://developers.facebook.com/tools/debug/accesstoken)
+2. Paste your token → click **Debug**
+3. Find the row **"Ablaufdatum"** — copy the number before the parenthesis (e.g. `1784580703`)
+4. Add it to `.env`: `INSTAGRAM_TOKEN_EXPIRES_AT=1784580703`
 
 #### Option B: Exchange a short-lived token
 

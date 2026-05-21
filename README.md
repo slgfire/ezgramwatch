@@ -223,9 +223,6 @@ Re-generate the token in the App Dashboard under **Instagram Graph API → API S
 **`Fatal: unable to open database file`**
 The container cannot write to the `./data` directory. Either fix ownership (`sudo chown -R 1000:1000 ./data`) or set `user: "root"` in `compose.yaml`.
 
-**`manifest unknown` when running `docker compose up`**
-The GHCR package is private. Go to your GitHub profile → **Packages → ezgramwatch → Package Settings → Change visibility → Public**.
-
 ---
 
 ## Known Limitations

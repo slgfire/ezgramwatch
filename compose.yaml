@@ -6,7 +6,4 @@ services:
     env_file: .env
     volumes:
       - ./data:/data
-    # Must match the node user (uid=1000) set in Dockerfile.
-    # If your host data/ dir has different ownership, run:
-    #   sudo chown -R 1000:1000 ./data
-    user: "1000:1000"
+    user: "root"

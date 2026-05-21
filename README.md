@@ -83,16 +83,18 @@ Your Instagram account is now linked to the app.
 1. Open the [Graph API Explorer](https://developers.facebook.com/tools/explorer).
 2. Select your app from the top-right dropdown.
 3. Click **Generate Access Token**.
-4. In the permission dialog, make sure both of these are checked:
-   - `instagram_basic`
-   - `pages_read_engagement`
+4. In the permission dialog, make sure at least one of these is checked:
+   - `instagram_business_basic` *(newer apps — recommended)*
+   - `instagram_basic` + `pages_read_engagement` *(older app setup)*
 5. Click **Generate Access Token** and confirm in the popup. Copy the token shown.
 
-The token from the Explorer is valid for only **1 hour**. Exchange it for a 60-day token in the next step.
+#### Option A: Dashboard token (newer apps)
 
-#### 4b. Exchange for a long-lived token
+Newer Meta apps offer a token generator directly in the App Dashboard under **Instagram Graph API → API Setup → Generate Token**. This produces a **long-lived token (~60 days) directly** — no exchange needed. Verify in the [Token Debugger](https://developers.facebook.com/tools/debug/accesstoken): if "Expires" shows ~2 months, you're done.
 
-Run the following `curl` command, replacing the placeholders with your values:
+#### Option B: Exchange a short-lived token
+
+If you generated the token via Graph API Explorer it expires in 1 hour. Exchange it for a 60-day token:
 
 ```bash
 curl "https://graph.facebook.com/oauth/access_token\
@@ -102,21 +104,9 @@ curl "https://graph.facebook.com/oauth/access_token\
 &fb_exchange_token=YOUR_SHORT_LIVED_TOKEN"
 ```
 
-You'll find your **App ID** and **App Secret** in the App Dashboard under **Settings → Basic**.
+App ID and App Secret are in **Settings → Basic**. The `access_token` in the response is your `INSTAGRAM_ACCESS_TOKEN`.
 
-The response looks like this:
-
-```json
-{
-  "access_token": "EAABsb...",
-  "token_type": "bearer",
-  "expires_in": 5183944
-}
-```
-
-Copy the `access_token` value — this is your `INSTAGRAM_ACCESS_TOKEN`. It's valid for ~60 days.
-
-> **Tip:** To avoid manually renewing every 60 days, set `META_APP_ID` and `META_APP_SECRET` in your `.env`. The bot will auto-refresh the token when it has fewer than 7 days remaining.
+> **Tip:** Set `META_APP_ID` and `META_APP_SECRET` in `.env` so the bot auto-refreshes the token before it expires.
 
 ---
 

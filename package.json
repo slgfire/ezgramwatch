@@ -1,6 +1,6 @@
 {
   "name": "ezgramwatch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Discord webhook bot that mirrors Instagram Business/Creator posts and Reels via the official Meta Graph API.",
   "author": "FiRE <fire@saar-lan.de>",
   "license": "MIT",
